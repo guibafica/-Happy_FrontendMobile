@@ -57,3 +57,5 @@ export default function Routes() {
     </NavigationContainer>
   );
 }
+
+// 26:00
