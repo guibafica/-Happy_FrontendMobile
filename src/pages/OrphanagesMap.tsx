@@ -11,7 +11,7 @@ import api from '../services/api';
 
 interface Orphanage {
   id: number;
-  nome: string;
+  name: string;
   latitude: number;
   longitude: number;
 }
@@ -26,8 +26,8 @@ export default function OrphanagesMap() {
     });
   }, []);
   
-  function handleNavigateToOrphanageDetails() {
-    navigation.navigate('OrphanegeDetails');
+  function handleNavigateToOrphanageDetails(id: number) {
+    navigation.navigate('OrphanegeDetails', { id });
   }
 
   function handleNavigateToCreateOrphanage() {
@@ -60,9 +60,9 @@ export default function OrphanagesMap() {
                 longitude: orphanage.longitude,
               }}
             >
-              <Callout tooltip onPress={handleNavigateToOrphanageDetails}>
+              <Callout tooltip onPress={() => handleNavigateToOrphanageDetails(orphanage.id)}>
                 <View style={styles.calloutContainer}>
-                  <Text style={styles.calloutText}>{orphanage.nome}</Text>
+                  <Text style={styles.calloutText}>{orphanage.name}</Text>
                 </View>
               </Callout>
             </Marker>
@@ -71,7 +71,7 @@ export default function OrphanagesMap() {
       </MapView>
       
       <View style={styles.footer}>
-        <Text style={styles.footerText}>2 orfanatos encontrados</Text>
+        <Text style={styles.footerText}>{orphanages.length} orfanatos encontrados</Text>
 
         <RectButton 
           style={styles.createOrphanageButton} 
