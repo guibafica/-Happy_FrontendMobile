@@ -7,10 +7,14 @@ import { useRoute } from '@react-navigation/native';
 
 import mapMarkerImg from '../images/map-marker.png';
 
+interface OrphanageDetailsRouteParams {
+  id: number;
+}
+
 export default function OrphanageDetails() {
   const route = useRoute();
 
-  console.log(route.params);
+  const params = route.params as OrphanageDetailsRouteParams;
 
   return (
     <ScrollView style={styles.container}>
