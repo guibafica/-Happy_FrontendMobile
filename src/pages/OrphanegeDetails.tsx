@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, View, ScrollView, Text, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Feather, FontAwesome } from '@expo/vector-icons';
@@ -6,15 +6,46 @@ import { RectButton } from 'react-native-gesture-handler';
 import { useRoute } from '@react-navigation/native';
 
 import mapMarkerImg from '../images/map-marker.png';
+import api from '../services/api';
 
 interface OrphanageDetailsRouteParams {
   id: number;
 }
 
+interface Orphanage { 
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  about: string;
+  instructions: string;
+  opening_hours: string;
+  open_on_weekends: boolean;
+  images: Array<{
+    id: number;
+    url: string;
+  }>;
+}
+
 export default function OrphanageDetails() {
   const route = useRoute();
+  const [orphanages, setOrphanages] = useState<Orphanage>();
 
   const params = route.params as OrphanageDetailsRouteParams;
+
+  useEffect(() => {
+    api.get(`orphanages/${params.id}`).then(response => {
+      setOrphanages(response.data);
+    })
+  }, [params.id]);
+
+  if (!orphanages) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.description}>Carregando...</Text>
+      </View>
+    )
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -27,14 +58,14 @@ export default function OrphanageDetails() {
       </View>
 
       <View style={styles.detailsContainer}>
-        <Text style={styles.title}>Orf. Esperança</Text>
-        <Text style={styles.description}>Presta assistência a crianças de 06 a 15 anos que se encontre em situação de risco e/ou vulnerabilidade social.</Text>
+        <Text style={styles.title}>{orphanages.name}</Text>
+        <Text style={styles.description}>{orphanages.about}</Text>
       
         <View style={styles.mapContainer}>
           <MapView 
             initialRegion={{
-              latitude: -27.2092052,
-              longitude: -49.6401092,
+              latitude: orphanages.latitude,
+              longitude: orphanages.longitude,
               latitudeDelta: 0.008,
               longitudeDelta: 0.008,
             }} 
@@ -47,8 +78,8 @@ export default function OrphanageDetails() {
             <Marker 
               icon={mapMarkerImg}
               coordinate={{ 
-                latitude: -27.2092052,
-                longitude: -49.6401092
+                latitude: orphanages.latitude,
+                longitude: orphanages.longitude,
               }}
             />
           </MapView>
@@ -61,13 +92,14 @@ export default function OrphanageDetails() {
         <View style={styles.separator} />
 
         <Text style={styles.title}>Instruções para visita</Text>
-        <Text style={styles.description}>Venha como se sentir a vontade e traga muito amor e paciência para dar.</Text>
+        <Text style={styles.description}>{orphanages.instructions}</Text>
 
         <View style={styles.scheduleContainer}>
           <View style={[styles.scheduleItem, styles.scheduleItemBlue]}>
             <Feather name="clock" size={40} color="#2AB5D1" />
-            <Text style={[styles.scheduleText, styles.scheduleTextBlue]}>Segunda à Sexta 8h às 18h</Text>
+            <Text style={[styles.scheduleText, styles.scheduleTextBlue]}>Segunda à Sexta {orphanages.opening_hours}</Text>
           </View>
+          
           <View style={[styles.scheduleItem, styles.scheduleItemGreen]}>
             <Feather name="info" size={40} color="#39CC83" />
             <Text style={[styles.scheduleText, styles.scheduleTextGreen]}>Atendemos fim de semana</Text>
